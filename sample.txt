@@ -1,0 +1,4 @@
+Python is simple and powerful.
+Python is popular for data science.
+Programming improves problem solving.
+Python makes programming fun.
