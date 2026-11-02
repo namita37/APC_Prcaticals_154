@@ -1,0 +1,86 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Interactive Regex Tester{% endblock %}
+
+{% block content %}
+<div class="auth-card auth-card-wide">
+    <div class="card-header">
+        <h2>🔍 Interactive Regex Tester</h2>
+        <p>Test and experiment with regular expression matching in Python</p>
+    </div>
+
+    <!-- Presets -->
+    <div style="background: #eef2ff; border: 1px solid #c7d2fe; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+        <span style="font-weight: 600; font-size: 0.9rem; color: var(--primary);">Quick Preset Examples:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+            {% for name, pattern, sample in preset_patterns %}
+                <button type="button" 
+                        onclick="setPreset('{{ pattern|escapejs }}', '{{ sample|escapejs }}')" 
+                        style="background: white; border: 1px solid #a5b4fc; border-radius: 0.25rem; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer; color: #3730a3;">
+                    {{ name }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if error_msg %}
+            <div class="alert alert-error">{{ error_msg }}</div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="pattern">Regular Expression Pattern (Python `re` syntax):</label>
+            <input type="text" name="pattern" id="pattern" class="form-input" 
+                   value="{{ pattern_input }}" placeholder="e.g. ^[a-zA-Z][a-zA-Z0-9_]{2,19}$" required>
+        </div>
+
+        <div class="form-group">
+            <label for="test_string">Test String / Input Data:</label>
+            <input type="text" name="test_string" id="test_string" class="form-input" 
+                   value="{{ test_input }}" placeholder="e.g. user_123" required>
+        </div>
+
+        <button type="submit" class="btn-submit">Evaluate Match</button>
+    </form>
+
+    {% if result %}
+        <div style="margin-top: 2rem; border-top: 2px solid var(--border-color); padding-top: 1.5rem;">
+            <h3>Match Results</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div style="padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: {% if result.full_match %}#d1fae5{% else %}#fee2e2{% endif %};">
+                    <strong>Full Match (`re.fullmatch`):</strong>
+                    <div style="font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; color: {% if result.full_match %}#065f46{% else %}#991b1b{% endif %};">
+                        {% if result.full_match %}✅ MATCHED{% else %}❌ NO FULL MATCH{% endif %}
+                    </div>
+                    <small style="color: var(--text-muted);">Matches the entire string from start to finish</small>
+                </div>
+
+                <div style="padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: {% if result.search_match %}#dbeafe{% else %}#f3f4f6{% endif %};">
+                    <strong>Search Match (`re.search`):</strong>
+                    <div style="font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; color: {% if result.search_match %}#1e40af{% else %}#6b7280{% endif %};">
+                        {% if result.search_match %}🔎 FOUND IN STRING{% else %}❌ NOT FOUND{% endif %}
+                    </div>
+                    <small style="color: var(--text-muted);">Checks if pattern exists anywhere inside string</small>
+                </div>
+            </div>
+
+            {% if result.matches %}
+                <div style="margin-top: 1rem; padding: 1rem; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                    <strong>Captured Tokens / Matches (`re.findall`):</strong>
+                    <pre style="margin-top: 0.5rem; font-family: monospace; background: white; padding: 0.5rem; border-radius: 0.25rem; border: 1px solid var(--border-color);">{{ result.matches }}</pre>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function setPreset(pattern, sample) {
+        document.getElementById('pattern').value = pattern;
+        document.getElementById('test_string').value = sample;
+    }
+</script>
+{% endblock %}

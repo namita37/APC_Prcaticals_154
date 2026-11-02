@@ -1,0 +1,60 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Dashboard - Regex Validation Overview{% endblock %}
+
+{% block content %}
+<div class="auth-card auth-card-wide">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <h2>Hello, {{ user.first_name|default:user.username }}! 👋</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">You are authenticated and viewing the secure area.</p>
+        </div>
+        <div>
+            <a href="{% url 'regex_demo' %}" style="background-color: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                Interactive Regex Tester 🔍
+            </a>
+        </div>
+    </div>
+
+    {% if profile %}
+        <div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem; margin-bottom: 2rem; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">Your Profile Data (Validated via Regex)</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.95rem;">
+                <div><strong>Username:</strong> {{ user.username }}</div>
+                <div><strong>Email:</strong> {{ user.email }}</div>
+                <div><strong>Full Name:</strong> {{ profile.full_name }}</div>
+                <div><strong>Phone:</strong> {{ profile.phone|default:"Not specified" }}</div>
+                <div><strong>Gender:</strong> {{ profile.get_gender_display|default:"Not specified" }}</div>
+                <div><strong>Registered:</strong> {{ profile.joined_on|date:"M d, Y" }}</div>
+            </div>
+        </div>
+    {% endif %}
+
+    <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Regular Expressions Used in this App</h3>
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color); background: #f9fafb;">
+                    <th style="padding: 0.75rem;">Field</th>
+                    <th style="padding: 0.75rem;">Regular Expression Pattern</th>
+                    <th style="padding: 0.75rem;">Validation Rule</th>
+                    <th style="padding: 0.75rem;">Valid Examples</th>
+                    <th style="padding: 0.75rem;">Invalid Examples</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in regex_patterns %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 0.75rem; font-weight: 600;">{{ item.name }}</td>
+                        <td style="padding: 0.75rem;"><span class="regex-badge">{{ item.pattern }}</span></td>
+                        <td style="padding: 0.75rem; color: var(--text-muted);">{{ item.rules }}</td>
+                        <td style="padding: 0.75rem; color: var(--success); font-family: monospace;">{{ item.valid }}</td>
+                        <td style="padding: 0.75rem; color: var(--danger); font-family: monospace;">{{ item.invalid }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Register - Regex Verified{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width: 540px;">
+    <div class="card-header">
+        <h2>Create Account</h2>
+        <p>Register with strict Regular Expression validation</p>
+    </div>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if field.help_text %}
+                    <div class="form-help">{{ field.help_text }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-submit">Complete Registration</button>
+    </form>
+
+    <p class="text-center mt-4" style="font-size: 0.9rem; color: var(--text-muted);">
+        Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Login here</a>
+    </p>
+</div>
+{% endblock %}
